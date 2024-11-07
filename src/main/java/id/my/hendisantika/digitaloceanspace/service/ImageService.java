@@ -1,7 +1,10 @@
 package id.my.hendisantika.digitaloceanspace.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import id.my.hendisantika.digitaloceanspace.model.Image;
 import id.my.hendisantika.digitaloceanspace.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +53,7 @@ public class ImageService {
         var image = Image.builder()
                 .name(imgName)
                 .createdTime(new Timestamp(new Date().getTime()))
-                .ext(extension)
+                .extension(extension)
                 .link(doSpaceEndpointForData + File.separator + key)
                 .build();
         log.info("Saving image {}", image);
@@ -74,4 +77,13 @@ public class ImageService {
         }
     }
 
+    private void saveImageToServer(MultipartFile file, String key) throws IOException {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getInputStream().available());
+        if (file.getContentType() != null && !"".equals(file.getContentType())) {
+            metadata.setContentType(file.getContentType());
+        }
+        s3Client.putObject(new PutObjectRequest(doSpaceBucket, key, file.getInputStream(), metadata)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+    }
 }
