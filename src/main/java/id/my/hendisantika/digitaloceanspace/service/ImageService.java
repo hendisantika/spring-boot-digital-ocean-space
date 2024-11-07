@@ -1,11 +1,19 @@
 package id.my.hendisantika.digitaloceanspace.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import id.my.hendisantika.digitaloceanspace.model.Image;
 import id.my.hendisantika.digitaloceanspace.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,4 +40,21 @@ public class ImageService {
 
     @Value("${do.spaces.endpoint}")
     private String doSpaceEndpointForData;
+
+    public Image saveFile(MultipartFile file) throws IOException {
+        var extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        var imgName = FilenameUtils.removeExtension(file.getOriginalFilename());
+        var key = FOLDER + file.getOriginalFilename();
+        saveImageToServer(file, key);
+        var image = Image.builder()
+                .name(imgName)
+                .createdTime(new Timestamp(new Date().getTime()))
+                .ext(extension)
+                .link(doSpaceEndpointForData + File.separator + key)
+                .build();
+        log.info("Saving image {}", image);
+        return imageRepository.save(image);
+    }
+
+
 }
