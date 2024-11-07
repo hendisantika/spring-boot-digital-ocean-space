@@ -1,6 +1,7 @@
 package id.my.hendisantika.digitaloceanspace.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import id.my.hendisantika.digitaloceanspace.model.Image;
 import id.my.hendisantika.digitaloceanspace.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
@@ -56,5 +57,21 @@ public class ImageService {
         return imageRepository.save(image);
     }
 
+    public String deleteFile(String filename) {
+        try {
+            var imagName = filename.substring(filename.lastIndexOf("/") + 1, filename.lastIndexOf("."));
+            var data = imageRepository.findImageByName(imagName);
+            if (data.isPresent()) {
+                var image = data.get();
+                var key = FOLDER + image.getName() + "." + image.getExtension();
+                s3Client.deleteObject(new DeleteObjectRequest(doSpaceBucket, key));
+                imageRepository.delete(image);
+                log.info("Deleted image {}", image);
+            }
+            return "Deleted.";
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
 
 }
