@@ -1,0 +1,23 @@
+spring.application.name: spring-boot-digital-ocean-space
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/imageDB
+    username: hendisantika
+    password: hendi34
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+## DO properties
+do:
+  spaces:
+    key: ${DO_SPACE_KEY:-}
+    secret: ${DO_SPACE_SECRET:-}
+    endpoint: ${DO_SPACE_ENDPOINT:-}
+    region: ${DO_SPACE_REGIONL:-}
+    bucket: ${DO_SPACE_BUCKET:-}
