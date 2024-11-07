@@ -4,6 +4,8 @@ import id.my.hendisantika.digitaloceanspace.model.Image;
 import id.my.hendisantika.digitaloceanspace.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +39,11 @@ public class ImageController {
     public ResponseEntity<Image> uploadFile(@RequestParam("file") final MultipartFile file) throws IOException {
         var response = imageService.saveFile(file);
         return ResponseEntity.ok(response);
+    }
 
+    @DeleteMapping("/delete/{filename:.+}")
+    public ResponseEntity<String> deleteFile(@PathVariable final String filename) {
+        var response = imageService.deleteFile(filename);
+        return ResponseEntity.ok(response);
     }
 }
