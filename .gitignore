@@ -14,6 +14,10 @@ target/
 
 ### IntelliJ IDEA ###
 .idea
+logs
+pgadmin
+postgres17
+postgres_data
 *.iws
 *.iml
 *.ipr
