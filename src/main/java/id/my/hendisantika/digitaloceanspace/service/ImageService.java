@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,6 +59,11 @@ public class ImageService {
                 .build();
         log.info("Saving image {}", image);
         return imageRepository.save(image);
+    }
+
+    public List<Image> listImages() {
+        log.info("Listing images");
+        return imageRepository.findAll();
     }
 
     public String deleteFile(String filename) {
