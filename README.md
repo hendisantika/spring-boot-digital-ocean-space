@@ -8,3 +8,17 @@
 4. Run the application: `mvn clean spring-boot:run`
 5. Open POSTMAN App then import POSTMAN collection file
 6. Hit the API
+
+### Image Screen shot
+
+Upload new Image
+
+![Upload new Image](img/upload.png "Upload new Image")
+
+List All images
+
+![List All images](img/list.png "List All images")
+
+Delete Image by filename
+
+![Delete Image by filename](img/delete.png "Delete Image by filename")
