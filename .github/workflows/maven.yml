@@ -13,11 +13,26 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+
+    permissions:
+      # Required by the dependency submission API (Update dependency graph step)
+      contents: write
+
+    env:
+      TC_CLOUD_TOKEN: ${{ secrets.TC_CLOUD_TOKEN }}
 
     steps:
     - uses: actions/checkout@v7
@@ -27,15 +42,19 @@ jobs:
         java-version: '25'
         distribution: 'temurin'
         cache: maven
-        
+
     - name: Setup Testcontainers Cloud Client
+      # Secrets are not available for Dependabot / fork pull requests
+      if: ${{ env.TC_CLOUD_TOKEN != '' }}
       uses: atomicjar/testcontainers-cloud-setup-action@v1
       with:
-        token: ${{ secrets.TC_CLOUD_TOKEN }}        
-        
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+        token: ${{ env.TC_CLOUD_TOKEN }}
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+    - name: Build with Maven
+      run: ./mvnw -B package --file pom.xml
+
+    # Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive.
+    # Only on push to main: pull requests (incl. Dependabot) get a read-only GITHUB_TOKEN.
     - name: Update dependency graph
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       uses: advanced-security/maven-dependency-submission-action@a64327a7329c9939cf675e458452febe1894a70c
